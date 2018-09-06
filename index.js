@@ -119,6 +119,21 @@ export default class AutoTags extends Component {
           defaultValue={query}
           value={query}
           onChangeText={text => this.handleInput(text)}
+          // Use backspace to delete tags. For some reason react-native fires an
+          // _extra_ backspace keypress event the first time a (new) key is
+          // pressed after the original backspace,  so this code sets a short
+          // delay to ignore that erroneous event and only remove tags on the
+          // original one.
+          onKeyPress={(e) =>  {
+            if (e.nativeEvent.key === 'Backspace' && !query) {
+              // Return if duration between previous key press and backspace is less than 20ms
+              if (Math.abs(this.lastKeyEventTimestamp - e.timeStamp) < 20) return;
+              this.props.handleDelete(this.props.tagsSelected.length - 1)
+            } else {
+              // Record non-backspace key event time stamp
+              this.lastKeyEventTimestamp = e.timeStamp;
+            }
+          }}
           onSubmitEditing={this.onSubmitEditing}
           multiline={true}
           autoFocus={this.props.autoFocus === false ? false : true}
