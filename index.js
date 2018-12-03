@@ -10,7 +10,8 @@ import Autocomplete from "react-native-autocomplete-input";
 
 export default class AutoTags extends Component {
   state = {
-    query: ""
+    query: "",
+    eventCount: 0,
   };
 
   renderTags = () => {
@@ -125,13 +126,21 @@ export default class AutoTags extends Component {
           // delay to ignore that erroneous event and only remove tags on the
           // original one.
           onKeyPress={(e) =>  {
-            if (e.nativeEvent.key === 'Backspace' && !query) {
+            if ((e.nativeEvent.eventCount !== this.state.eventCount) && e.nativeEvent.key === 'Backspace' && !query) {
               // Return if duration between previous key press and backspace is less than 20ms
               if (Math.abs(this.lastKeyEventTimestamp - e.timeStamp) < 20) return;
               this.props.handleDelete(this.props.tagsSelected.length - 1)
+
+              // Cache the event count in state so that we don't get accidental
+              // deletions on input blur, plus 1 for the backspace key
+              this.setState({ eventCount: e.nativeEvent.eventCount + 1 })
             } else {
               // Record non-backspace key event time stamp
               this.lastKeyEventTimestamp = e.timeStamp;
+
+              // Cache the event count in state so that we don't get accidental
+              // deletions on input blur
+              this.setState({ eventCount: e.nativeEvent.eventCount })
             }
           }}
           onSubmitEditing={this.onSubmitEditing}
