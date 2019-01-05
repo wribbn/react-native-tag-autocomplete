@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import {
   StyleSheet,
   Text,
+  TextInput,
+  Keyboard,
   TouchableHighlight,
   TouchableOpacity,
   View
@@ -154,6 +156,14 @@ export default class AutoTags extends Component {
                 <Text>{suggestion.name}</Text>
               )}
             </TouchableOpacity>
+          )}
+          renderTextInput={props => (
+            <TextInput
+              returnKeyType="search"
+              blurOnSubmit={true}
+              onSubmitEditing={() => Keyboard.dismiss()}
+              {...props}
+            />
           )}
           inputContainerStyle={
             this.props.inputContainerStyle || styles.inputContainerStyle
